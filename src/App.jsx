@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Github, Linkedin, Mail, ExternalLink, Code2, BookOpen, User, Send, ChevronRight, GraduationCap, Award, Zap, Briefcase, Calendar } from 'lucide-react';
+import { Github, Linkedin, Mail, ExternalLink, Code2, BookOpen, User, Send, ChevronRight, GraduationCap, Award, Zap, Briefcase, Calendar, Check } from 'lucide-react';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('experience');
+  const [copied, setCopied] = useState(false);
 
   const userInfo = {
     name: "Emma Yu",
@@ -13,6 +14,29 @@ const App = () => {
     email: "jjyu4672@gmail.com",
     github: "https://github.com/jjy88",
     linkedin: "https://www.linkedin.com/in/emma-y-658b491a1/"
+  };
+
+  /
+  const handleEmailClick = (e) => {
+    e.preventDefault();
+    
+    const textArea = document.createElement("textarea");
+    textArea.value = userInfo.email;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // 2秒后恢复原样
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+    document.body.removeChild(textArea);
+
+    // 尝试在后台打开 mailto
+    setTimeout(() => {
+      window.location.href = `mailto:${userInfo.email}`;
+    }, 100);
   };
 
   const skills = {
@@ -28,7 +52,7 @@ const App = () => {
       period: "Jan 2026 - Mar 2026",
       desc: "Selected for the global mentorship program. Integrating OpenSSF security standards and optimizing repository security for Hyphae APIs via Scorecard reports.",
       highlights: ["OpenSSF Standards", "JUnit Testing", "Global Collaboration"],
-      githubLink: "https://github.com/hyphae/APIS" // Added GitHub link here
+      githubLink: "https://github.com/lf-energy/hyphae"
     },
     {
       company: "EdVisingU AI (Riipen)",
@@ -102,9 +126,13 @@ const App = () => {
               <a href={userInfo.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-slate-100 text-slate-700 rounded-xl hover:border-blue-200 hover:text-blue-600 transition">
                 <Linkedin size={20} /> LinkedIn
               </a>
-              <a href={`mailto:${userInfo.email}`} className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-slate-100 text-slate-700 rounded-xl hover:border-blue-200 hover:text-blue-600 transition">
-                <Mail size={20} /> Email
-              </a>
+              <button 
+                onClick={handleEmailClick}
+                className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-slate-100 text-slate-700 rounded-xl hover:border-blue-200 hover:text-blue-600 transition min-w-[120px] justify-center"
+              >
+                {copied ? <Check size={20} className="text-green-500" /> : <Mail size={20} />}
+                <span>{copied ? "Copied!" : "Email"}</span>
+              </button>
             </div>
           </div>
         </section>
@@ -226,32 +254,19 @@ const App = () => {
                         <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded tracking-wide uppercase">{userInfo.graduation}</span>
                       </div>
                       <p className="text-slate-500">{userInfo.major}</p>
-                      <ul className="mt-4 space-y-2 text-sm text-slate-500 list-disc list-inside">
-                        <li>Relevant Coursework: Data Structures, OS, Networks, DBMS</li>
-                        <li>Certifications: AWS ML Foundations, SAP ERP, Foundational C# (Microsoft)</li>
-                      </ul>
                     </div>
-                  </div>
-                  <div className="p-8 bg-slate-50/50 rounded-2xl border border-slate-100">
-                    <div className="flex items-center gap-4 mb-6 text-blue-600">
-                      <User size={24} />
-                      <h3 className="text-xl font-bold text-slate-900">Background</h3>
-                    </div>
-                    <p className="text-slate-500 leading-relaxed font-medium">
-                      I'm a junior CS student with a proven ability to adapt across diverse technical ecosystems, from auditing open-source security at the <strong>Linux Foundation</strong> to supporting mission-critical <strong>SAP ERP systems</strong>. I specialize in building efficient workflows and backend services that scale.
-                    </p>
                   </div>
                 </div>
 
                 <div className="bg-slate-900 p-8 rounded-3xl text-white flex flex-col justify-center relative overflow-hidden h-fit sticky top-24">
                   <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl"></div>
                   <h3 className="text-2xl font-bold mb-4">Let's Connect</h3>
-                  <p className="text-slate-400 mb-8 text-sm leading-relaxed">
-                    Open for <span className="text-white font-bold">Summer 2026/27 Internship</span>. Let's discuss how my diverse internship experience can contribute to your team.
-                  </p>
-                  <a href={`mailto:${userInfo.email}`} className="flex items-center justify-between w-full px-6 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20">
-                    Email Me <ChevronRight size={20} />
-                  </a>
+                  <button 
+                    onClick={handleEmailClick}
+                    className="flex items-center justify-between w-full px-6 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20"
+                  >
+                    {copied ? "Copied!" : "Email Me"} <ChevronRight size={20} />
+                  </button>
                 </div>
               </div>
             </div>
