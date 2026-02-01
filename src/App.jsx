@@ -16,27 +16,30 @@ const App = () => {
     linkedin: "https://www.linkedin.com/in/emma-y-658b491a1/"
   };
 
-  /
-  const handleEmailClick = (e) => {
+  
+  const handleEmailClick = async (e) => {
     e.preventDefault();
     
-    const textArea = document.createElement("textarea");
-    textArea.value = userInfo.email;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // 2秒后恢复原样
-    } catch (err) {
-      console.error('Copy failed', err);
-    }
-    document.body.removeChild(textArea);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
 
-    // 尝试在后台打开 mailto
-    setTimeout(() => {
-      window.location.href = `mailto:${userInfo.email}`;
-    }, 100);
+   
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(userInfo.email);
+      } catch (err) {
+       
+        const textArea = document.createElement("textarea");
+        textArea.value = userInfo.email;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+    }
+
+    
+    window.location.href = `mailto:${userInfo.email}`;
   };
 
   const skills = {
@@ -126,12 +129,17 @@ const App = () => {
               <a href={userInfo.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-slate-100 text-slate-700 rounded-xl hover:border-blue-200 hover:text-blue-600 transition">
                 <Linkedin size={20} /> LinkedIn
               </a>
+              {/* 关键按钮：增加 min-w 防止跳动，确保显示 Copied! */}
               <button 
                 onClick={handleEmailClick}
-                className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-slate-100 text-slate-700 rounded-xl hover:border-blue-200 hover:text-blue-600 transition min-w-[120px] justify-center"
+                className={`flex items-center gap-2 px-6 py-3 border-2 transition-all duration-300 rounded-xl min-w-[140px] justify-center ${
+                  copied 
+                  ? 'bg-green-50 border-green-200 text-green-600' 
+                  : 'bg-white border-slate-100 text-slate-700 hover:border-blue-200 hover:text-blue-600'
+                }`}
               >
-                {copied ? <Check size={20} className="text-green-500" /> : <Mail size={20} />}
-                <span>{copied ? "Copied!" : "Email"}</span>
+                {copied ? <Check size={20} className="animate-in zoom-in" /> : <Mail size={20} />}
+                <span className="font-semibold">{copied ? "Copied!" : "Email"}</span>
               </button>
             </div>
           </div>
@@ -261,11 +269,17 @@ const App = () => {
                 <div className="bg-slate-900 p-8 rounded-3xl text-white flex flex-col justify-center relative overflow-hidden h-fit sticky top-24">
                   <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl"></div>
                   <h3 className="text-2xl font-bold mb-4">Let's Connect</h3>
+                  {/* 侧边栏按钮同步增加反馈 */}
                   <button 
                     onClick={handleEmailClick}
-                    className="flex items-center justify-between w-full px-6 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20"
+                    className={`flex items-center justify-between w-full px-6 py-4 rounded-2xl font-bold transition-all shadow-lg ${
+                      copied 
+                      ? 'bg-green-500 shadow-green-900/20' 
+                      : 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/20'
+                    }`}
                   >
-                    {copied ? "Copied!" : "Email Me"} <ChevronRight size={20} />
+                    <span>{copied ? "Email Copied!" : "Email Me"}</span>
+                    {copied ? <Check size={20} /> : <ChevronRight size={20} />}
                   </button>
                 </div>
               </div>
